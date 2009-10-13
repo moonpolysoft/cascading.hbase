@@ -27,8 +27,9 @@
 
   <!-- assumes Cascading shares the same parent directory, change if necessary -->
   <property name="cascading.home" location="${basedir}/../cascading"/>
-  <property file="${cascading.home}/version.properties"/>
-  <property name="cascading.release.version" value="x.y.z"/>
+  <!-- <property file="${cascading.home}/version.properties"/> -->
+  <!-- <property name="build.number" value="dev"/> -->
+  <property name="cascading.release.version" value="1.1.0-dev"/>
   <property name="cascading.filename.core" value="cascading-core-${cascading.release.version}.jar"/>
   <property name="cascading.filename.xml" value="cascading-xml-${cascading.release.version}.jar"/>
   <property name="cascading.libs" value="${cascading.home}/lib"/>
@@ -81,7 +82,7 @@
     </fileset>
 
     <fileset dir="${hadoop.home}/build" erroronmissingdir="false">
-      <include name="*.jar"/>
+      <include name="**/*.jar"/>
     </fileset>
 
     <fileset dir="${hadoop.lib}">
@@ -93,7 +94,7 @@
     </fileset>
 
     <fileset dir="${hbase.home}/build" erroronmissingdir="false">
-      <include name="*.jar"/>
+      <include name="**/*.jar"/>
     </fileset>
 
     <fileset dir="${hbase.lib}">
