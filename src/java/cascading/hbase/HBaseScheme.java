@@ -14,6 +14,7 @@ package cascading.hbase;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import cascading.scheme.Scheme;
 import cascading.tap.Tap;
@@ -21,17 +22,12 @@ import cascading.tuple.Fields;
 import cascading.tuple.Tuple;
 import cascading.tuple.TupleEntry;
 import cascading.util.Util;
-import org.apache.hadoop.hbase.io.BatchUpdate;
-import org.apache.hadoop.hbase.io.Cell;
-import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
-import org.apache.hadoop.hbase.io.RowResult;
-import org.apache.hadoop.hbase.mapred.TableInputFormat;
-import org.apache.hadoop.hbase.mapred.TableOutputFormat;
+import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.mapreduce.*;
+import org.apache.hadoop.hbase.io.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.OutputCollector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The HBaseScheme class is a {@link Scheme} subclass. It is used in conjunction with the {@HBaseTap} to
@@ -41,8 +37,6 @@ import org.slf4j.LoggerFactory;
  */
 public class HBaseScheme extends Scheme
   {
-  /** Field LOG */
-  private static final Logger LOG = LoggerFactory.getLogger( HBaseScheme.class );
 
   /** Field keyFields */
   private Fields keyField;
@@ -158,23 +152,27 @@ public class HBaseScheme extends Scheme
     return familyNameSet.toArray( new String[0] );
     }
 
+  @SuppressWarnings("unchecked")
   public Tuple source( Object key, Object value )
     {
     Tuple result = new Tuple();
 
     ImmutableBytesWritable keyWritable = (ImmutableBytesWritable) key;
-    RowResult row = (RowResult) value;
+    Result row = (Result) value;
 
     result.add( Bytes.toString( keyWritable.get() ) );
-
-    for( byte[] bytes : getFieldsBytes() )
-      {
-      Cell cell = row.get( bytes );
-      result.add( cell != null ? Bytes.toString( cell.getValue() ) : "" );
+    
+    for (int i = 0; i < familyNames.length; i++) {
+      Fields cfFields = valueFields[i];
+      for (Comparable comparable : cfFields) {
+        String qualifier = (String) comparable;
+        byte[] cell = row.getValue(familyNames[i].getBytes(), qualifier.getBytes());
+        result.add(cell);
       }
+    }
 
     return result;
-    }
+  }
 
   private byte[][] getFieldsBytes()
     {
