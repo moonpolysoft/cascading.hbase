@@ -27,9 +27,10 @@ import cascading.flow.Flow;
 import cascading.tuple.TupleEntryIterator;
 import org.apache.hadoop.hbase.HBaseClusterTestCase;
 import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.Scanner;
-import org.apache.hadoop.hbase.io.BatchUpdate;
-import org.apache.hadoop.hbase.io.RowResult;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.Scan;
+// import org.apache.hadoop.hbase.io.RowResult;
 import org.apache.hadoop.hbase.util.Bytes;
 
 /**
@@ -59,35 +60,34 @@ public class HBaseTestCase extends HBaseClusterTestCase
     assertEquals( "wrong number of values in " + flow.getSink().toString(), expects, count );
     }
 
-  protected void loadTable( String tableName, String charCol, int size ) throws IOException
+  // protected void loadTable( String tableName, String charCol, int size ) throws IOException
+  //   {
+  //   HTable table = new HTable( conf, tableName );
+  // 
+  //   for( int i = 0; i < size; i++ )
+  //     {
+  //     byte[] bytes = Bytes.toBytes( Integer.toString( i ) );
+  //     BatchUpdate batchUpdate = new BatchUpdate( bytes );
+  // 
+  //     batchUpdate.put( charCol, bytes );
+  // 
+  //     table.commit( batchUpdate );
+  //     }
+  // 
+  //   table.close();
+  //   }
+
+  protected void verify( String tableName, String colFam, String charCol, int expected ) throws IOException
     {
     HTable table = new HTable( conf, tableName );
-
-    for( int i = 0; i < size; i++ )
-      {
-      byte[] bytes = Bytes.toBytes( Integer.toString( i ) );
-      BatchUpdate batchUpdate = new BatchUpdate( bytes );
-
-      batchUpdate.put( charCol, bytes );
-
-      table.commit( batchUpdate );
-      }
-
-    table.close();
-    }
-
-  protected void verify( String tableName, String charCol, int expected ) throws IOException
-    {
-    byte[][] columns = Bytes.toByteArrays( new String[]{charCol} );
-
-    HTable table = new HTable( conf, tableName );
-    Scanner scanner = table.getScanner( columns );
+    
+    ResultScanner scanner = table.getScanner( colFam.getBytes(), charCol.getBytes() );
 
     int count = 0;
-    for( RowResult rowResult : scanner )
+    for( Result rowResult : scanner )
       {
       count++;
-      System.out.println( "rowResult = " + rowResult.get( charCol ) );
+      System.out.println( "rowResult = " + rowResult.getValue( colFam.getBytes(), charCol.getBytes() ) );
       }
 
     scanner.close();
