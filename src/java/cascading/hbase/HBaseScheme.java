@@ -63,12 +63,26 @@ public class HBaseScheme extends Scheme {
     this.keyField = keyField;
     this.scanner = scanner;
     this.fieldMap = fieldMap;
-    this.valueFields = new Fields((Comparable[]) fieldMap.keySet().toArray());
+    this.valueFields = new Fields((Comparable[]) fieldMap.keySet().toArray(new Comparable[] {}));
 
-    setSourceSink(keyField, new Fields[] { valueFields });
+    setSourceSink(keyField, valueFields);
 
     validate();
   }
+  
+  public HBaseScheme(Fields keyField, Map<String, byte[][]> fieldMap) {
+    this.keyField = keyField;
+    this.fieldMap = fieldMap;
+    this.valueFields = new Fields((Comparable[]) fieldMap.keySet().toArray(new Comparable[] {}));
+    this.scanner = new Scan();
+    
+    setSourceSink(keyField, valueFields);
+    
+    validate();
+  }
+  
+  //===========================================================================
+  // Scheme API
 
   @SuppressWarnings("unchecked")
   public Tuple source(Object key, Object value) {
