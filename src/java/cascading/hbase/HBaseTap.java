@@ -12,6 +12,7 @@ import org.apache.hadoop.hbase.MasterNotRunningException;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
+import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.JobConf;
 
 import cascading.tap.SinkMode;
@@ -130,9 +131,11 @@ public class HBaseTap extends Tap {
     super.sinkInit(conf);
   }
   
+  @SuppressWarnings("deprecation")
   public void sourceInit(JobConf conf) throws IOException {
     conf.set(TableInputFormat.INPUT_TABLE, tableName);
-    super.sinkInit(conf);
+    FileInputFormat.addInputPath( conf, getPath() );
+    super.sourceInit(conf);
   }
   //===========================================================================
   
