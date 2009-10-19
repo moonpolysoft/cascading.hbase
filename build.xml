@@ -68,37 +68,24 @@
     <pathelement location="${cascading.lib.core}"/>
     <pathelement location="${cascading.lib.xml}"/>
 
-    <fileset dir="${cascading.libs}">
-      <include name="**/*.jar"/>
-    </fileset>
-
-
-    <!--<fileset dir="${lib.dir}">-->
-    <!--<include name="*.jar"/>-->
-    <!--</fileset>-->
-
-    <fileset dir="${hadoop.home}">
+    <fileset dir="${cascading.home}/build">
       <include name="*.jar"/>
     </fileset>
-
-    <fileset dir="${hadoop.home}/build" erroronmissingdir="false">
+    
+    <fileset dir="${cascading.home}/lib">
+      <include name="*.jar"/>
+    </fileset>
+    
+    <fileset dir="${hbase.home}/build">
       <include name="**/*.jar"/>
     </fileset>
-
-    <fileset dir="${hadoop.lib}">
-      <include name="**/*.jar"/>
+    
+    <fileset dir="${hadoop.home}/build">
+      <include name="*.jar"/>
     </fileset>
-
+    
     <fileset dir="${hbase.home}">
-      <include name="*.jar"/>
-    </fileset>
-
-    <fileset dir="${hbase.home}/build" erroronmissingdir="false">
-      <include name="**/*.jar"/>
-    </fileset>
-
-    <fileset dir="${hbase.lib}">
-      <include name="**/*.jar"/>
+      <include name="**/commons-codec*.jar"/>
     </fileset>
 
   </path>
@@ -157,10 +144,10 @@
     <mkdir dir="${test.results}"/>
     <mkdir dir="build/test/log"/>
 
-    <junit printsummary="true" showoutput="${test.showoutput}" fork="yes" haltonerror="no" haltonfailure="no" dir="."
+    <junit printsummary="true" showoutput="false" fork="yes" haltonerror="yes" haltonfailure="yes" dir="."
            maxmemory="756m">
 
-      <sysproperty key="test.cluster.enabled" value="${test.cluster.enabled}"/>
+      <sysproperty key="test.cluster.enabled" value="true"/>
       <sysproperty key="test.build.data" value="data"/>
       <sysproperty key="hadoop.log.dir" value="build/test/log"/>
 
