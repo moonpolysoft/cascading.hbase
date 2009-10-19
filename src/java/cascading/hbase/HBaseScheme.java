@@ -25,12 +25,14 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
+import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
+import org.apache.hadoop.hbase.util.Base64;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.mapred.InputFormat;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.OutputFormat;
+import org.apache.hadoop.mapreduce.InputFormat;
+import org.apache.hadoop.mapreduce.OutputFormat;
 
 import cascading.scheme.Scheme;
 import cascading.tap.Tap;
@@ -46,9 +48,10 @@ import cascading.tuple.TupleEntry;
  * 
  * @see HBaseTap
  */
+@SuppressWarnings("deprecation")
 public class HBaseScheme extends Scheme {
   private Fields keyField;
-  private Scan scanner;
+  private transient Scan scanner;
   private Map<String, byte[][]> fieldMap;
   private Fields valueFields;
 
