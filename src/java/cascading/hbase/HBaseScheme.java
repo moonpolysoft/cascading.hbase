@@ -127,22 +127,22 @@ public class HBaseScheme extends Scheme {
     outputCollector.collect(null, put);
   }
 
-  @SuppressWarnings("deprecation")
+  @SuppressWarnings({ "cast", "deprecation", "unchecked" })
   public void sinkInit(Tap tap, JobConf conf) throws IOException {
-    conf
-        .setOutputFormat((Class<? extends OutputFormat>) TableOutputFormat.class);
+    conf.setOutputFormat(TableOutputFormatWrap.class);
 
     conf.setOutputKeyClass(ImmutableBytesWritable.class);
     conf.setOutputValueClass(Put.class);
   }
 
-  @SuppressWarnings("deprecation")
+  @SuppressWarnings({ "cast", "deprecation", "unchecked" })
   public void sourceInit(Tap tap, JobConf conf) throws IOException {
     try {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      scanner.write(new DataOutputStream(baos));
-      conf.set(TableInputFormat.SCAN, baos.toString());
-      conf.setInputFormat((Class<? extends InputFormat>) TableInputFormat.class);
+      ByteArrayOutputStream out = new ByteArrayOutputStream();  
+      DataOutputStream dos = new DataOutputStream(out);
+      scanner.write(dos);
+      conf.set(TableInputFormat.SCAN, Base64.encodeBytes(out.toByteArray()));
+      conf.setInputFormat(TableInputFormatWrap.class);
     } catch (IOException ex) {
       throw new TapException(ex);
     }
@@ -154,7 +154,7 @@ public class HBaseScheme extends Scheme {
           + keyField.print());
   }
 
-  private void setSourceSink(Fields keyFields, Fields[] columnFields) {
+  private void setSourceSink(Fields keyFields, Fields columnFields) {
     Fields allFields = Fields.join(keyFields, Fields.join(columnFields)); // prepend
 
     setSourceFields(allFields);
