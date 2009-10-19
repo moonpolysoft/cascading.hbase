@@ -63,9 +63,13 @@ public class MultiFamilyCascadeHBaseTest extends HBaseTestCase
 //    parsePipe = new Each( parsePipe, new Debug() );
 
     Fields keyFields = new Fields( "num" );
-    String[] familyNames = {"left", "right"};
-    Fields[] valueFields = new Fields[]{new Fields( "lower" ), new Fields( "upper" )};
-    Tap hBaseTap = new HBaseTap( "multitable", new HBaseScheme( keyFields, familyNames, valueFields ) );
+    Map<String, byte[][]> fieldMap = new HashMap<String, byte[][]>();
+    fieldMap.put("lower", new byte[][] {"left".getBytes(), "lower".getBytes()});
+    fieldMap.put("upper", new byte[][] {"right".getBytes(), "lower".getBytes()});
+    
+    HBaseScheme scheme = new HBaseScheme(keyFields, fieldMap);
+    
+    Tap hBaseTap = new HBaseTap( "multitable", scheme );
 
     Flow parseFlow = new FlowConnector( properties ).connect( source, hBaseTap, parsePipe );
 
@@ -82,7 +86,7 @@ public class MultiFamilyCascadeHBaseTest extends HBaseTestCase
 
     cascade.complete();
 
-    verify( "multitable", "left:lower", 13 );
+    verify( "multitable", "left", "lower", 13 );
 
     verifySink( parseFlow, 13 );
     verifySink( copyFlow, 13 );
@@ -94,7 +98,7 @@ public class MultiFamilyCascadeHBaseTest extends HBaseTestCase
 
     cascade.complete();
 
-    verify( "multitable", "left:lower", 26 );
+    verify( "multitable", "left", "lower", 26 );
 
     verifySink( parseFlow, 26 );
     verifySink( copyFlow, 26 );
