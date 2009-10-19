@@ -3,3 +3,6 @@ build
 *.iml
 *.iws
 *.ipr
+.classpath
+.idea
+.project
