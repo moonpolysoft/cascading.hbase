@@ -117,7 +117,7 @@ public class HBaseScheme extends Scheme {
     Iterator it = valueFields.iterator();
     for (int i = 0; it.hasNext(); i++) {
       String name = (String) it.next();
-      byte[] cell = (byte[]) values.getObject(i);
+      byte[] cell = ((String) values.getObject(i)).getBytes();
       byte[][] cfqual = fieldMap.get(name);
       byte[] cf = cfqual[0];
       byte[] qualifier = cfqual[1];
